@@ -1,0 +1,16 @@
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataVolume
+metadata:
+  name: cirros-demo-dv
+  namespace: kubevirt-lab
+spec:
+  source:
+    http:
+      url: https://download.cirros-cloud.net/0.6.2/cirros-0.6.2-x86_64-disk.img
+  pvc:
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 2Gi
+    volumeMode: Block

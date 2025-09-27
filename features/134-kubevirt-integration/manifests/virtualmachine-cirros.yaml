@@ -1,0 +1,29 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: cirros-vm
+  namespace: kubevirt-lab
+  labels:
+    app: cirros-demo
+spec:
+  running: false
+  template:
+    metadata:
+      labels:
+        kubevirt.io/domain: cirros-vm
+    spec:
+      domain:
+        cpu:
+          cores: 1
+        resources:
+          requests:
+            memory: 256Mi
+        devices:
+          disks:
+            - name: containerdisk
+              disk:
+                bus: virtio
+      volumes:
+        - name: containerdisk
+          dataVolume:
+            name: cirros-demo-dv
