@@ -8,7 +8,7 @@ MODE="single"
 NODE_NAME=""
 CONTROL_HOST=""
 NODES_FILE=""
-SSH_OPTS=${SSH_OPTS:-"-o BatchMode=yes"}
+SSH_OPTS=${SSH_OPTS:-"-o BatchMode=yes -o StrictHostKeyChecking=accept-new"}
 JOINED_WORKERS=()
 
 K3S_VERSION="v1.34.1+k3s1"
@@ -220,9 +220,34 @@ remote_install_worker() {
         agent_exec+=" --node-name ${worker_name}"
     fi
 
+    log "Verifying SSH access to ${worker_name:-$ssh_target}"
+    if ! ssh $SSH_OPTS "$ssh_target" "exit 0" >/dev/null 2>&1; then
+        cat >&2 <<EOF
+Failed to SSH into ${ssh_target}. Ensure that the control plane user's public key is present in ${ssh_target}:~/.ssh/authorized_keys and that passwordless sudo is configured.
+EOF
+        exit 1
+    fi
+
     log "Joining worker ${worker_name:-$ssh_target} via ${ssh_target}"
     ssh $SSH_OPTS "$ssh_target" <<EOF
 set -euo pipefail
+mkdir -p ~/.ssh
+chmod 700 ~/.ssh
+if [[ ! -f ~/.ssh/authorized_keys ]]; then
+    touch ~/.ssh/authorized_keys
+    chmod 600 ~/.ssh/authorized_keys
+fi
+for pub in ~/.ssh/id_ed25519.pub ~/.ssh/id_rsa.pub; do
+    if [[ -f "\$pub" ]]; then
+        key=\$(cat "\$pub")
+        grep -qxF "\$key" ~/.ssh/authorized_keys 2>/dev/null || echo "\$key" >> ~/.ssh/authorized_keys
+        break
+    fi
+done
+if ! sudo -n true 2>/dev/null; then
+    echo "Passwordless sudo is required on \$(hostname)." >&2
+    exit 1
+fi
 curl -sfL https://get.k3s.io | sudo INSTALL_K3S_VERSION='$K3S_VERSION' K3S_CHANNEL='$K3S_CHANNEL' K3S_URL='https://${CONTROL_HOST}:6443' K3S_TOKEN='$JOIN_TOKEN' INSTALL_K3S_EXEC='$agent_exec' sh -
 EOF
     JOINED_WORKERS+=("${worker_name:-$ssh_target}")

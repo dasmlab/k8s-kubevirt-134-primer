@@ -22,6 +22,9 @@ This installer provisions a `k3s` cluster pinned to Kubernetes `v1.34.1+k3s1`, t
    user ALL=(ALL) NOPASSWD:ALL
    ```
 3. If `sshd_config` has `PasswordAuthentication no`, ensure the key copy occurs before disabling password auth or temporarily set `PasswordAuthentication yes` and reload `sshd` to allow `ssh-copy-id`.
+4. The installer appends the worker's own public key to `~/.ssh/authorized_keys` during provisioning so that self-SSH (required by some tooling) succeeds.
+
+The script defaults `SSH_OPTS` to `-o BatchMode=yes -o StrictHostKeyChecking=accept-new`. Override by exporting your own `SSH_OPTS` before running if stricter host-key policies are required.
 
 These steps allow the installer to run remote `curl | sudo sh -` commands without prompting for passwords.
 
