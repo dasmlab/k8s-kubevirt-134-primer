@@ -8,7 +8,7 @@ MODE="single"
 NODE_NAME=""
 CONTROL_HOST=""
 NODES_FILE=""
-SSH_OPTS=${SSH_OPTS:-"-o BatchMode=yes -o StrictHostKeyChecking=accept-new"}
+SSH_OPTS=${SSH_OPTS:-"-o BatchMode=yes -o StrictHostKeyChecking=no"}
 JOINED_WORKERS=()
 
 K3S_VERSION="v1.34.1+k3s1"
@@ -212,6 +212,27 @@ resolve_control_host() {
     fi
 }
 
+extract_ssh_host() {
+    local target="$1"
+    target=${target#*@}
+    echo "${target%%:*}"
+}
+
+ensure_known_host() {
+    local ssh_target="$1"
+    local host
+    host=$(extract_ssh_host "$ssh_target")
+    [[ -z "$host" ]] && return
+    mkdir -p ~/.ssh
+    touch ~/.ssh/known_hosts
+    if ! ssh-keygen -F "$host" >/dev/null 2>&1; then
+        log "Scanning SSH host key for ${host}"
+        if ! ssh-keyscan -T 5 "$host" >> ~/.ssh/known_hosts 2>/dev/null; then
+            log "Warning: unable to retrieve host key for ${host}; continuing"
+        fi
+    fi
+}
+
 remote_install_worker() {
     local ssh_target="$1"
     local worker_name="$2"
@@ -220,6 +241,7 @@ remote_install_worker() {
         agent_exec+=" --node-name ${worker_name}"
     fi
 
+    ensure_known_host "$ssh_target"
     log "Verifying SSH access to ${worker_name:-$ssh_target}"
     if ! ssh $SSH_OPTS "$ssh_target" "exit 0" >/dev/null 2>&1; then
         cat >&2 <<EOF
