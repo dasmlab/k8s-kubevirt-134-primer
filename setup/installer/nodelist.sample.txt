@@ -1,0 +1,4 @@
+# Sample nodes file for cluster mode
+# format: ssh_target [node_name]
+ubuntu@worker-01 worker-01
+ubuntu@worker-02 worker-02

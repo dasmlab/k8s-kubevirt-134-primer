@@ -1,8 +1,9 @@
 # KubeVirt Integration Lab
 
 ```mermaid
-flowchart TD
-    ControlPlane[K3s Control Plane] --> Operator[KubeVirt Operator]
+flowchart BT
+    Node[Node / Machine] --> ControlPlane[K3s Control Plane]
+    ControlPlane --> Operator[KubeVirt Operator]
     Operator --> CRDs[CRDs: VirtualMachine, VMI]
     CRDs --> NodeExt[Node Virtualization Extensions]
     NodeExt --> Guests[Guest VM Workloads]
