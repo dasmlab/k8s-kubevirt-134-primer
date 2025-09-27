@@ -12,6 +12,7 @@ SSH_OPTS_STRING=${SSH_OPTS:-"-o BatchMode=yes -o StrictHostKeyChecking=no"}
 JOINED_WORKERS=()
 
 CONTROL_USER=${SUDO_USER:-$(id -un)}
+CONTROL_USER_GROUP="$(id -gn "$CONTROL_USER")"
 CONTROL_USER_HOME="$(eval echo "~${CONTROL_USER}")"
 
 # shellcheck disable=SC2206
@@ -301,12 +302,13 @@ done
 if ! sudo -n true 2>/dev/null; then
     cat <<'MSG' >&2
 Passwordless sudo is required on this worker. Update /etc/sudoers, e.g.:
-  user ALL=(ALL) NOPASSWD:ALL
+  USERNAME ALL=(ALL) NOPASSWD:ALL
 MSG
     exit 1
 fi
 curl -sfL https://get.k3s.io | sudo INSTALL_K3S_VERSION="$K3S_VERSION" K3S_CHANNEL="$K3S_CHANNEL" K3S_URL="https://$CONTROL_HOST:6443" K3S_TOKEN="$JOIN_TOKEN" INSTALL_K3S_EXEC="$agent_exec" sh -
 EOF
+    chown "$CONTROL_USER:$CONTROL_USER_GROUP" "$script_path"
     chmod 600 "$script_path"
 }
 
@@ -345,6 +347,7 @@ EOF
 
     log "Uploading worker join script to ${worker_name:-$ssh_target}"
     control_scp "$worker_script" "$ssh_target:/tmp/k3s-worker-join.sh"
+    rm -f "$worker_script"
     log "Joining worker ${worker_name:-$ssh_target} via ${ssh_target}"
     if ! control_ssh "$ssh_target" "bash /tmp/k3s-worker-join.sh"; then
         cat >&2 <<EOF
