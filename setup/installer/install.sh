@@ -379,7 +379,7 @@ join_workers() {
     if [[ -z "$NODES_FILE" ]]; then
         log "Cluster mode enabled but no nodes file supplied; skipping worker joins"
         return
-    fi
+   fi
 
     local resolved_file
     if [[ -f "$NODES_FILE" ]]; then
@@ -394,15 +394,9 @@ join_workers() {
     resolve_control_host
     fetch_join_token
 
-    while IFS= read -r line || [[ -n "$line" ]]; do
-        # Trim leading/trailing whitespace
-        line="${line##*( )}"
-        line="${line%%*( )}"
-        [[ -z "$line" || "$line" == \#* ]] && continue
-        # shellcheck disable=SC2086
-        set -- $line
-        local target="$1"
-        local worker_name="${2:-}"
+    while read -r target worker_name _; do
+        [[ -z "$target" || ${target:0:1} == "#" ]] && continue
+        log "Processing worker entry: ${worker_name:-$target}"
         remote_install_worker "$target" "$worker_name"
     done < "$resolved_file"
 }

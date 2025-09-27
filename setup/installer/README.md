@@ -70,7 +70,7 @@ kubectl get pods -A
 virtctl version --client
 ```
 
-The expected output shows KubeVirt control plane pods in the `kubevirt` namespace and CDI pods in `cdi`:
+The installer relaxes the kubeconfig permissions (644) so the deploying user can run these commands without switching to root. The expected output shows KubeVirt control plane pods in the `kubevirt` namespace and CDI pods in `cdi`:
 
 ![kubectl get pods -A and get nodes after install](../../docs/images/kubectl-status.png)
 
@@ -88,14 +88,14 @@ An example run (highlight the KubeVirt CRDs) is shown below:
 
 ## Cleanup
 
-To tear down the environment when finished:
+To return the hosts to a clean state (control plane and workers):
 
 ```
-/usr/local/bin/k3s-killall.sh
-/usr/local/bin/k3s-uninstall.sh
+sudo ./uninstall.sh --nodes-file nodes.txt
 ```
+
+The script removes KubeVirt/CDI resources, uninstalls k3s, and deletes kubeconfig/artifact directories on the control plane and listed workers. Omit `--nodes-file` for single-node labs.
 
 ## Next Steps
 
-- Walk through the feature labs under `features/` starting with [`134-kubevirt-integration`](../../features/134-kubevirt-integration).
-- Dive deeper into each CRD and accompanying workflows in that directory’s README and manifests.
+- Walk through the feature labs under `

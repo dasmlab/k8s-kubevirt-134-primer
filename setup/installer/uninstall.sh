@@ -82,12 +82,8 @@ cleanup_workers() {
     exit 1
   fi
 
-  while IFS= read -r line || [[ -n "$line" ]]; do
-    line="${line##*( )}"
-    line="${line%%*( )}"
-    [[ -z "$line" || "$line" == \#* ]] && continue
-    set -- $line
-    local target="$1"
+  while read -r target _; do
+    [[ -z "$target" || ${target:0:1} == "#" ]] && continue
     remote_uninstall_worker "$target"
   done < "$resolved_file"
 }
