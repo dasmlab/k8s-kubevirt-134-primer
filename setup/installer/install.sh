@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+
 K3S_VERSION="v1.34.1+k3s1"
 K3S_CHANNEL="stable"
 INSTALL_K3S_EXEC="server --disable traefik"
@@ -82,8 +85,17 @@ install_cdi() {
 }
 
 setup_crds() {
-    log "Applying base CRDs"
-    $KUBECTL --kubeconfig "$K3S_KUBECONFIG" apply -k /home/dasm/k8s-134-installer/features/134-kubevirt-integration/manifests || true
+    local manifests_dir="${PROJECT_ROOT}/features/134-kubevirt-integration/manifests"
+    if [[ -d "$manifests_dir" ]]; then
+        if compgen -G "${manifests_dir}/*" >/dev/null; then
+            log "Applying base CRDs from ${manifests_dir}"
+            $KUBECTL --kubeconfig "$K3S_KUBECONFIG" apply -k "$manifests_dir"
+        else
+            log "Skipping CRD apply: ${manifests_dir} is empty"
+        fi
+    else
+        log "Skipping CRD apply: manifests directory not found at ${manifests_dir}"
+    fi
 }
 
 wait_for_kubevirt() {
@@ -104,7 +116,7 @@ Validate components:
   virtctl version
 
 Next steps:
-  Explore feature labs under /home/dasm/k8s-134-installer/features
+  Explore feature labs under ${PROJECT_ROOT}/features
 EOF
 }
 
