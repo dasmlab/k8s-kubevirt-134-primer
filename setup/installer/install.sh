@@ -28,7 +28,7 @@ control_user_run() {
 
 control_ssh() {
     # shellcheck disable=SC2086
-    control_user_run ssh ${SSH_OPTS[@]} "$@"
+    control_user_run ssh -n ${SSH_OPTS[@]} "$@"
 }
 
 control_scp() {
