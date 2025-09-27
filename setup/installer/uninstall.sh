@@ -82,10 +82,15 @@ cleanup_workers() {
     exit 1
   fi
 
+  local processed=0
   while read -r target _; do
+    target=${target%%$'\r'*}
     [[ -z "$target" || ${target:0:1} == "#" ]] && continue
     remote_uninstall_worker "$target"
+    processed=$((processed + 1))
   done < "$resolved_file"
+
+  echo "Worker uninstall entries processed: $processed"
 }
 
 cleanup_control_plane_fs() {
