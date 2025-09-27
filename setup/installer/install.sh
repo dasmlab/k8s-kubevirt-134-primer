@@ -11,40 +11,48 @@ NODES_FILE=""
 SSH_OPTS_STRING=${SSH_OPTS:-"-o BatchMode=yes -o StrictHostKeyChecking=no"}
 JOINED_WORKERS=()
 
-CONTROL_USER="$(id -un)"
+CONTROL_USER=${SUDO_USER:-$(id -un)}
 CONTROL_USER_HOME="$(eval echo "~${CONTROL_USER}")"
 
 # shellcheck disable=SC2206
 SSH_OPTS=($SSH_OPTS_STRING)
 
+control_user_run() {
+    if [[ ${SUDO_USER:-} ]]; then
+        sudo -H -u "$CONTROL_USER" "$@"
+    else
+        "$@"
+    fi
+}
+
 control_ssh() {
     # shellcheck disable=SC2086
-    ssh ${SSH_OPTS[@]} "$@"
+    control_user_run ssh ${SSH_OPTS[@]} "$@"
 }
 
 control_scp() {
     # shellcheck disable=SC2086
-    scp ${SSH_OPTS[@]} "$@"
+    control_user_run scp ${SSH_OPTS[@]} "$@"
 }
 
 control_ssh_keygen() {
-    ssh-keygen "$@"
+    control_user_run ssh-keygen "$@"
 }
 
 control_ssh_keyscan() {
-    ssh-keyscan "$@"
+    control_user_run ssh-keyscan "$@"
 }
 
 control_mkdir() {
-    mkdir -p "$@"
+    control_user_run mkdir -p "$@"
 }
 
 control_touch() {
-    touch "$@"
+    control_user_run touch "$@"
 }
 
 control_chmod() {
-    chmod "$@"
+    control_user_run chmod "$@"
 }
 
 require_local_sudo() {
