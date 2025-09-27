@@ -166,6 +166,13 @@ install_k3s() {
     sudo systemctl enable --now k3s
 }
 
+make_kubeconfig_readable() {
+    if sudo test -f "$K3S_KUBECONFIG"; then
+        sudo chmod 755 /etc/rancher /etc/rancher/k3s 2>/dev/null || true
+        sudo chmod 644 "$K3S_KUBECONFIG"
+    fi
+}
+
 wait_for_k3s() {
     log "Waiting for k3s API server to become ready"
     until sudo $KUBECTL --kubeconfig "$K3S_KUBECONFIG" get nodes >/dev/null 2>&1; do
@@ -301,12 +308,19 @@ for pub in ~/.ssh/id_ed25519.pub ~/.ssh/id_rsa.pub; do
 done
 if ! sudo -n true 2>/dev/null; then
     cat <<'MSG' >&2
-Passwordless sudo is required on this worker. Update /etc/sudoers, e.g.:
-  USERNAME ALL=(ALL) NOPASSWD:ALL
+Passwordless sudo is required on this worker. Update /etc/sudoers, for example:
+  $(whoami) ALL=(ALL) NOPASSWD:ALL
 MSG
     exit 1
 fi
 curl -sfL https://get.k3s.io | sudo INSTALL_K3S_VERSION="$K3S_VERSION" K3S_CHANNEL="$K3S_CHANNEL" K3S_URL="https://$CONTROL_HOST:6443" K3S_TOKEN="$JOIN_TOKEN" INSTALL_K3S_EXEC="$agent_exec" sh -
+for _ in {1..10}; do
+    if sudo test -f /etc/rancher/k3s/k3s.yaml; then
+        sudo chmod 644 /etc/rancher/k3s/k3s.yaml
+        break
+    fi
+    sleep 2
+done
 EOF
     chown "$CONTROL_USER:$CONTROL_USER_GROUP" "$script_path"
     chmod 600 "$script_path"
@@ -424,6 +438,7 @@ main() {
     verify_dependencies
     prepare_tmp
     install_k3s
+    make_kubeconfig_readable
     wait_for_k3s
     join_workers
     install_virtctl
