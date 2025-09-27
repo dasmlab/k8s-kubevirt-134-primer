@@ -4,7 +4,7 @@ set -euo pipefail
 K3S_VERSION="v1.34.1+k3s1"
 K3S_CHANNEL="stable"
 INSTALL_K3S_EXEC="server --disable traefik"
-KUBEVIRT_VERSION="release-1.2"
+KUBEVIRT_VERSION="v1.2.0"
 CDI_VERSION="v1.60.1"
 TMP_DIR="/tmp/k8s-134-installer"
 KUBECTL="/usr/local/bin/kubectl"
@@ -65,7 +65,7 @@ install_virtctl() {
 
     local url="https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_VERSION}/virtctl-${KUBEVIRT_VERSION}-linux-${arch}"
     log "Downloading virtctl from $url"
-    curl -L "$url" -o "$TMP_DIR/virtctl"
+    curl -Lf "$url" -o "$TMP_DIR/virtctl"
     install -m 0755 "$TMP_DIR/virtctl" /usr/local/bin/virtctl
 }
 
