@@ -21,7 +21,7 @@ To bootstrap the cluster:
 
 | Feature | Version | Summary | Link | Blog Link |
 | --- | --- | --- | --- | --- |
-| KubeVirt Virtualization Add-on | 1.34 | Extend the cluster with KubeVirt operator and CRDs to schedule virtual machines alongside containers. | [features/134-kubevirt-integration](features/134-kubevirt-integration) | TBD |
+| KubeVirt Virtualization Add-on | 1.34 | Extend the cluster with KubeVirt operator and CRDs to schedule virtual machines alongside containers. | [features/134-kubevirt-integration](features/134-kubevirt-integration) | [Medium](https://medium.com/@danielsmith_81273/taking-kubevirt-and-k8s-1-34-1-33-for-a-ride-8ad3eba255bb) |
 | Gateway API Consistency Updates | 1.34 | Unifies status conditions and cross-namespace referencing rules as Gateway API matures. | [features/134-gateway-api-consistency](features/134-gateway-api-consistency) | TBD |
 | KMS Provider v2 Enhancements | 1.34 | Improves envelope encryption performance and observability for secrets at rest. | [features/134-kms-v2-enhancements](features/134-kms-v2-enhancements) | TBD |
 | Resilient Autoscaling Signals | 1.34 | Expands Horizontal Pod Autoscaler signal integration for responsive scaling under fluctuating workloads. | [features/134-resilient-autoscaling](features/134-resilient-autoscaling) | TBD |
