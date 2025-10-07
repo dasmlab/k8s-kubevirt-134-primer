@@ -146,6 +146,23 @@ verify_dependencies() {
     fi
 }
 
+configure_local_virtualization_prereqs() {
+    log "Configuring local virtualization prerequisites"
+    sudo groupadd -f kvm
+    if [[ -n "$CONTROL_USER" ]]; then
+        if ! id -nG "$CONTROL_USER" | grep -qw kvm; then
+            sudo usermod -aG kvm "$CONTROL_USER"
+        fi
+    fi
+    sudo mkdir -p /var/lib/dbus
+    sudo ln -sf /etc/machine-id /var/lib/dbus/machine-id
+    sudo tee /etc/udev/rules.d/65-kvm.rules >/dev/null <<'EOF'
+KERNEL=="kvm", GROUP="kvm", MODE="0660"
+EOF
+    sudo udevadm control --reload-rules
+    sudo udevadm trigger --name-match=kvm || true
+}
+
 prepare_tmp() {
     mkdir -p "$TMP_DIR"
 }
@@ -313,6 +330,17 @@ Passwordless sudo is required on this worker. Update /etc/sudoers, for example:
 MSG
     exit 1
 fi
+sudo groupadd -f kvm
+if ! id -nG "\$(whoami)" | grep -qw kvm; then
+    sudo usermod -aG kvm "\$(whoami)"
+fi
+sudo mkdir -p /var/lib/dbus
+sudo ln -sf /etc/machine-id /var/lib/dbus/machine-id
+sudo tee /etc/udev/rules.d/65-kvm.rules >/dev/null <<'RULE'
+KERNEL=="kvm", GROUP="kvm", MODE="0660"
+RULE
+sudo udevadm control --reload-rules
+sudo udevadm trigger --name-match=kvm || true
 curl -sfL https://get.k3s.io | sudo INSTALL_K3S_VERSION="$K3S_VERSION" K3S_CHANNEL="$K3S_CHANNEL" K3S_URL="https://$CONTROL_HOST:6443" K3S_TOKEN="$JOIN_TOKEN" INSTALL_K3S_EXEC="$agent_exec" sh -
 for _ in {1..10}; do
     if sudo test -f /etc/rancher/k3s/k3s.yaml; then
@@ -436,6 +464,7 @@ main() {
     parse_args "$@"
     require_local_sudo
     verify_dependencies
+    configure_local_virtualization_prereqs
     prepare_tmp
     install_k3s
     make_kubeconfig_readable

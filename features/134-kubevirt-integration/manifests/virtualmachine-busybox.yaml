@@ -1,0 +1,27 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: busybox-vm
+  namespace: kubevirt-lab
+spec:
+  running: false
+  template:
+    metadata:
+      labels:
+        kubevirt.io/domain: busybox-vm
+    spec:
+      terminationGracePeriodSeconds: 0
+      domain:
+        devices:
+          disks:
+            - name: rootdisk
+              disk:
+                bus: virtio
+        resources:
+          requests:
+            memory: 64Mi
+      volumes:
+        - name: rootdisk
+          containerDisk:
+            image: docker.io/kubevirt/busybox-container-disk-demo:latest
+
