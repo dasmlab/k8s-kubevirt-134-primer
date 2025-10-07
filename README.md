@@ -19,15 +19,15 @@ To bootstrap the cluster:
 
 ## Feature Exploration Index
 
-| Feature | Version | Summary | Link |
-| --- | --- | --- | --- |
-| KubeVirt Virtualization Add-on | 1.34 | Extend the cluster with KubeVirt operator and CRDs to schedule virtual machines alongside containers. | [features/134-kubevirt-integration](features/134-kubevirt-integration) |
-| Gateway API Consistency Updates | 1.34 | Unifies status conditions and cross-namespace referencing rules as Gateway API matures. | [features/134-gateway-api-consistency](features/134-gateway-api-consistency) |
-| KMS Provider v2 Enhancements | 1.34 | Improves envelope encryption performance and observability for secrets at rest. | [features/134-kms-v2-enhancements](features/134-kms-v2-enhancements) |
-| Resilient Autoscaling Signals | 1.34 | Expands Horizontal Pod Autoscaler signal integration for responsive scaling under fluctuating workloads. | [features/134-resilient-autoscaling](features/134-resilient-autoscaling) |
-| Dynamic Resource Allocation GA | 1.33 | Enables workloads to request specialized hardware resources via dynamic resource claims. | [features/133-dynamic-resource-allocation](features/133-dynamic-resource-allocation) |
-| Node Swap Support (Beta) | 1.33 | Allows controlled swap usage on nodes, improving memory overcommit flexibility. | [features/133-node-swap-support](features/133-node-swap-support) |
-| Volume Attributes Class | 1.33 | Introduces reusable policies for storage driver attributes via the CSI Volume Attributes Class API. | [features/133-volume-attributes-class](features/133-volume-attributes-class) |
+| Feature | Version | Summary | Link | Blog Link |
+| --- | --- | --- | --- | --- |
+| KubeVirt Virtualization Add-on | 1.34 | Extend the cluster with KubeVirt operator and CRDs to schedule virtual machines alongside containers. | [features/134-kubevirt-integration](features/134-kubevirt-integration) | TBD |
+| Gateway API Consistency Updates | 1.34 | Unifies status conditions and cross-namespace referencing rules as Gateway API matures. | [features/134-gateway-api-consistency](features/134-gateway-api-consistency) | TBD |
+| KMS Provider v2 Enhancements | 1.34 | Improves envelope encryption performance and observability for secrets at rest. | [features/134-kms-v2-enhancements](features/134-kms-v2-enhancements) | TBD |
+| Resilient Autoscaling Signals | 1.34 | Expands Horizontal Pod Autoscaler signal integration for responsive scaling under fluctuating workloads. | [features/134-resilient-autoscaling](features/134-resilient-autoscaling) | TBD |
+| Dynamic Resource Allocation GA | 1.33 | Enables workloads to request specialized hardware resources via dynamic resource claims. | [features/133-dynamic-resource-allocation](features/133-dynamic-resource-allocation) | TBD |
+| Node Swap Support (Beta) | 1.33 | Allows controlled swap usage on nodes, improving memory overcommit flexibility. | [features/133-node-swap-support](features/133-node-swap-support) | TBD |
+| Volume Attributes Class | 1.33 | Introduces reusable policies for storage driver attributes via the CSI Volume Attributes Class API. | [features/133-volume-attributes-class](features/133-volume-attributes-class) | TBD |
 
 Each feature directory contains:
 
