@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kubevirt-lab
+  labels:
+    app.kubernetes.io/name: kubevirt-lab
+    app.kubernetes.io/part-of: kubevirt-exploration
+---
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: busybox-vm
+  namespace: kubevirt-lab
+  labels:
+    app: busybox-vm-demo
+spec:
+  running: false
+  template:
+    metadata:
+      labels:
+        kubevirt.io/domain: busybox-vm
+    spec:
+      domain:
+        cpu:
+          cores: 1
+        resources:
+          requests:
+            memory: 256Mi
+        devices:
+          disks:
+            - name: rootdisk
+              disk:
+                bus: virtio
+      volumes:
+        - name: rootdisk
+          containerDisk:
+            image: quay.io/containerdisks/busybox:1.35.0
